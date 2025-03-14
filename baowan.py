@@ -7,7 +7,7 @@ import sklearn
 # โหลดโมเดล Neural Network
 @st.cache_resource
 def load_nn_model():
-    return tf.keras.models.load_model("heart_disease_model.h5")
+    return tf.keras.models.load_model("heart_disease_model_updated.h5")
 
 # โหลดโมเดล Machine Learning
 @st.cache_resource
@@ -58,52 +58,52 @@ elif page == "อธิบายการพัฒนา Neural Network":
     5. การนำไปใช้งานจริง (Deployment)
     """)
 
+
 # หน้า Demo Machine Learning
 elif page == "Demo Machine Learning":
     st.title("Demo Machine Learning - ทำนายโรคเบาหวาน")
     st.write("กรอกข้อมูลเพื่อทำนายโรคเบาหวาน")
 
-    # ให้ผู้ใช้กรอกค่าฟีเจอร์ต่าง ๆ
-    pregnancies = st.number_input("จำนวนครั้งที่ตั้งครรภ์", min_value=0, max_value=20, value=1)
+    # ให้ผู้ใช้กรอกค่าฟีเจอร์ต่าง ๆ ตามโมเดลที่เทรน
+    age = st.number_input("อายุ", min_value=0, max_value=120, value=30)
+    bmi = st.number_input("ค่าดัชนีมวลกาย (BMI)", min_value=0.0, max_value=100.0, value=25.0, step=0.1)
     glucose = st.number_input("ระดับน้ำตาลในเลือด", min_value=0, max_value=300, value=120)
     blood_pressure = st.number_input("ความดันโลหิต", min_value=0, max_value=200, value=80)
-    skin_thickness = st.number_input("ความหนาของผิวหนัง (mm)", min_value=0, max_value=100, value=20)
-    insulin = st.number_input("ระดับอินซูลินในเลือด", min_value=0, max_value=900, value=80)
-    bmi = st.number_input("ค่าดัชนีมวลกาย (BMI)", min_value=0.0, max_value=100.0, value=25.0, step=0.1)
-    diabetes_pedigree = st.number_input("ประวัติเบาหวานในครอบครัว", min_value=0.0, max_value=3.0, value=0.5, step=0.01)
-    age = st.number_input("อายุ", min_value=0, max_value=120, value=30)
 
     # ปุ่มให้พยากรณ์
     if st.button("ทำนาย"):
         model = load_ml_model()
-        input_data = np.array([[pregnancies, glucose, blood_pressure, skin_thickness, insulin, bmi, diabetes_pedigree, age]])
+        input_data = np.array([[age, bmi, glucose, blood_pressure]])
         prediction = model.predict(input_data)
-
-        # แสดงผลลัพธ์
-        st.write(f"ผลการพยากรณ์: {'เป็นโรคเบาหวาน' if prediction[0] == 1 else 'ไม่เป็นโรคเบาหวาน'}")
+        risk_levels = {0: "High", 1: "Low", 2: "Medium"}
+        # แสดงผลลัพธ์ตามระดับความเสี่ยง
+        predicted_class = int(prediction[0])  # แปลงค่าผลลัพธ์ให้อยู่ในรูปแบบ int
+        risk_level = risk_levels.get(predicted_class, "ไม่ทราบ")
+        st.write(f"ผลการพยากรณ์: ระดับความเสี่ยง {risk_level}")
 
 # หน้า Demo Neural Network
 elif page == "Demo Neural Network":
-    st.title("Demo Neural Network")
+    st.title("Demo Neural Network - ทำนายโรคหัวใจ")
     st.write("กรอกข้อมูลเพื่อทำนายโรคหัวใจ")
 
-    # ให้ผู้ใช้กรอกค่าฟีเจอร์ต่าง ๆ
+    # ให้ผู้ใช้กรอกค่าฟีเจอร์ต่าง ๆ ตาม dataset ใหม่
     age = st.number_input("อายุ", min_value=0, max_value=120, value=50)
-    sex = st.selectbox("เพศ (0 = หญิง, 1 = ชาย)", [0, 1])
-    trestbps = st.number_input("ความดันโลหิตขณะพัก (mmHg)", min_value=50, max_value=250, value=140)
-    chol = st.number_input("ระดับคอเลสเตอรอล (mg/dL)", min_value=100, max_value=600, value=220)
-    fbs = st.selectbox("น้ำตาลในเลือดสูง (>120 mg/dL) (0 = ไม่, 1 = ใช่)", [0, 1])
-    restecg = st.selectbox("ผล ECG (0-2)", [0, 1, 2])
-    thalach = st.number_input("อัตราการเต้นของหัวใจสูงสุด", min_value=50, max_value=250, value=150)
-    exang = st.selectbox("มีอาการเจ็บหน้าอกขณะออกกำลังกาย (0 = ไม่, 1 = ใช่)", [0, 1])
-    oldpeak = st.number_input("ST depression", min_value=0.0, max_value=10.0, value=1.0, step=0.1)
-    slope = st.selectbox("Slope ของ ST segment (0-2)", [0, 1, 2])
+    gender = st.selectbox("เพศ (0 = หญิง, 1 = ชาย)", [0, 1])
+    cholesterol = st.number_input("ระดับคอเลสเตอรอล (mg/dL)", min_value=100, max_value=600, value=220)
+    bp_systolic = st.number_input("ความดันโลหิตตัวบน (BP_Systolic)", min_value=50, max_value=250, value=120)
+    bp_diastolic = st.number_input("ความดันโลหิตตัวล่าง (BP_Diastolic)", min_value=30, max_value=150, value=80)
+    bmi = st.number_input("ค่าดัชนีมวลกาย (BMI)", min_value=10.0, max_value=50.0, value=25.0, step=0.1)
+    hba1c = st.number_input("ระดับน้ำตาลสะสมในเลือด (HbA1c)", min_value=3.0, max_value=15.0, value=5.5, step=0.1)
+    smoking = st.selectbox("สูบบุหรี่ (0 = ไม่, 1 = ใช่)", [0, 1])
+    diabetes = st.selectbox("เบาหวาน (0 = ไม่, 1 = ใช่)", [0, 1])
 
     # ปุ่มให้พยากรณ์
     if st.button("ทำนาย"):
         model = load_nn_model()
-        input_data = np.array([[age, sex, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope]])
+        input_data = np.array([[
+            age, gender, cholesterol, bp_systolic, bp_diastolic, bmi, hba1c, smoking, diabetes
+        ]])
         prediction = model.predict(input_data)
 
         # แสดงผลลัพธ์
-        st.write(f"ผลการพยากรณ์: {'มีความเสี่ยง' if prediction[0][0] > 0.5 else 'ไม่มีความเสี่ยง'} (ค่าคะแนน: {prediction[0][0]:.4f})")
+        st.write(f"🔍 ค่าทำนายจากโมเดล (Raw Prediction): {prediction[0][0]}")
