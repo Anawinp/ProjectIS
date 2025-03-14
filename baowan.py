@@ -2,6 +2,7 @@ import streamlit as st
 import tensorflow as tf
 import numpy as np
 import pickle
+import sklearn
 
 # โหลดโมเดล Neural Network
 @st.cache_resource
